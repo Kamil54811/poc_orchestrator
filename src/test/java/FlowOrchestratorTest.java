@@ -5,8 +5,9 @@ import static org.junit.Assert.assertTrue;
 import app.FlowOrchestrator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import model.Message;
+import model.TimeAndCounter;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -33,32 +34,19 @@ public class FlowOrchestratorTest {
 			commonPool.execute(() -> sharedOrchestrator.processMessage(m));
 			commonPool.execute(() -> sharedOrchestrator.processMessage(m));
 		}
-		Thread.sleep(TIME_LIMIT_MILIS);
-		for (int i = 0; i < 2; i++) {
+		Thread.sleep(3*TIME_LIMIT_MILIS);
+		for (int i = 0; i <2; i++) {
 			commonPool.execute(() -> sharedOrchestrator.processMessage(d));
 			commonPool.execute(() -> sharedOrchestrator.processMessage(d));
+
 		}
 		Thread.sleep(TIME_LIMIT_MILIS /10);
 
 		//then
-		int count = sharedOrchestrator.getWorkingMap().getOrDefault(new Message("a", "b", "c"), new AtomicInteger(0)).get();
+		int count = sharedOrchestrator.getMap().getOrDefault(new Message("a", "b", "c").getMapKey(), new AtomicReference<>(new TimeAndCounter())).get().getAtomicInteger().get();
 		assertTrue(count > 0 && count < 7);
 	}
 
-	@Test
-	public void shouldPurge() throws InterruptedException {
-		//given
-		Message m = new Message("a", "b", "c");
-		Message d = new Message("a", "b", "c");
-		//when
-		for (int i = 0; i < 4; i++) {
-			commonPool.execute(() -> sharedOrchestrator.processMessage(m));
-			commonPool.execute(() -> sharedOrchestrator.processMessage(d));
-		}
-		Thread.sleep(TIME_LIMIT_MILIS +1);
-		//then
-		assertTrue(sharedOrchestrator.getWorkingMap().size() == 0);
-	}
 
 	@Test
 	public void shouldContainTwoElements() throws InterruptedException {
@@ -73,7 +61,7 @@ public class FlowOrchestratorTest {
 		}
 		//then
 		Thread.sleep(TIME_LIMIT_MILIS /5);
-		assertEquals(sharedOrchestrator.getWorkingMap().size() , 2);
+		assertEquals(sharedOrchestrator.getMap().size() , 2);
 	}
 
 }

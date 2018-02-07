@@ -35,4 +35,9 @@ public class Message {
 	public final int hashCode() {
 		return Objects.hash(getSource(), getType());
 	}
+
+	public String getMapKey() {
+		return source + type;
+	}
+
 }
