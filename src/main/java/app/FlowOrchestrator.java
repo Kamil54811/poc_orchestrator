@@ -16,7 +16,7 @@ public class FlowOrchestrator {
 	private final int OCCURRENCE_LIMIT;
 	private final int TIME_LIMIT;
 	private final ExecutorService WORKING_POOL;
-	private volatile ConcurrentMap<String, AtomicReference<TimeAndCounter>> map;
+	private ConcurrentMap<String, AtomicReference<TimeAndCounter>> map;
 
 	public FlowOrchestrator(int timeLimit, int maxLimit) {
 		this.OCCURRENCE_LIMIT = maxLimit;
